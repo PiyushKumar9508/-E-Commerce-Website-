@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Cart</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <section id="header">
+        <a href="#"><img src="/img/logo.png" class="logo"></a>
+        <div>
+            <ul id="navbar">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="blog.html">Blog</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a class="active" href="cart.html"><i class="fa-solid fa-cart-shopping"></i><span id="cart-count">0</span></a></li>
+            </ul>
+        </div>
+    </section>
+
+    <section id="page-header">
+        <h2>#stayhome</h2>
+        <p>Save more with coupons & up to 70% off</p>
+    </section>
+
+    <section id="cart" class="section-p1">
+        <h2>Your Cart</h2>
+        <table width="100%">
+            <thead>
+                <tr>
+                    <td>Remove</td>
+                    <td>Image</td>
+                    <td>Product</td>
+                    <td>Price</td>
+                    <td>Quantity</td>
+                    <td>Sub-Total</td>
+                </tr>
+            </thead>
+            <tbody id="cart-items">
+                <!-- Cart items will be injected here by JavaScript -->
+            </tbody>
+        </table>
+        <div class="cart-total">
+            <h3>Total: $<span id="cart-total">0.00</span></h3>
+        </div>
+        <button class="checkout-button" onclick="checkout()">Checkout</button>
+    </section>
+
+    <footer class="section-p1">
+        <div class="col">
+            <img class="logo" src="img/logo.png" alt="">
+            <h4>Contact</h4>
+            <p><strong>Address: </strong> Salt Lake , Sector 5 , Kolkata</p>
+            <p><strong>Phone: </strong> +91 9876 5432 10</p>
+            <p><strong>Hours: </strong> 10:00 - 18:00, Mon - Sat</p>
+            <div class="follow">
+                <h4>Follow Us</h4>
+                <div class="icons">
+                    <i class="fab fa-facebook-f"></i>
+                    <i class="fab fa-twitter"></i>
+                    <i class="fab fa-instagram"></i>
+                    <i class="fab fa-pinterest-p"></i>
+                    <i class="fab fa-youtube"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <h4>About</h4>
+            <a href="#">About Us</a>
+            <a href="#">Delivery Information</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms & Conditions</a>
+            <a href="#">Contact Us</a>
+        </div>
+        <div class="col">
+            <h4>My Account</h4>
+            <a href="#">Sign In</a>
+            <a href="#">View Cart</a>
+            <a href="#">My Wishlist</a>
+            <a href="#">Track My Order</a>
+            <a href="#">Help</a>
+        </div>
+        <div class="col install">
+            <h4>Install App</h4>
+            <p>From App Store or Google Play</p>
+            <div class="row">
+                <img src="img/pay/app.jpg" alt="">
+                <img src="img/pay/play.jpg" alt="">
+            </div>
+            <p>Secured Payment Gateways</p>
+            <img src="img/pay/pay.png" alt="">
+        </div>
+    </footer>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        function displayCart() {
+            const cartItemsContainer = document.getElementById("cart-items");
+            const cartTotal = document.getElementById("cart-total");
+            let total = 0;
+
+            cartItemsContainer.innerHTML = "";
+
+            cart.forEach(item => {
+                const subTotal = item.price * item.quantity;
+                total += subTotal;
+
+                const itemRow = document.createElement("tr");
+
+                itemRow.innerHTML = `
+                    <td><a href="#" onclick="removeFromCart(${item.id})"><i class="far fa-times-circle"></i></a></td>
+                    <td><img src="${item.image}" alt="${item.name}" class="cart-item-image" width="60"></td>
+                    <td>${item.name}</td>
+                    <td>$${item.price.toFixed(2)}</td>
+                    <td>${item.quantity}</td>
+                    <td>$${subTotal.toFixed(2)}</td>
+                `;
+
+                cartItemsContainer.appendChild(itemRow);
+            });
+
+            cartTotal.innerText = total.toFixed(2);
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = "<tr><td colspan='6'>Your cart is empty.</td></tr>";
+            }
+        }
+
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+            updateCartCount();
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert("Your cart is empty!");
+                return;
+            }
+
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+            });
+
+            alert(`Total Price: $${total.toFixed(2)}. Proceeding to checkout.`);
+            cart = [];  // Clear the cart after checkout
+            localStorage.setItem('cart', JSON.stringify(cart));
+            displayCart();
+            updateCartCount();
+
+            window.location.href = "orderPlaced.html";
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const cartCount = cart.reduce((count, item) => count + item.quantity, 0);
+            document.getElementById('cart-count').innerText = cartCount;
+        }
+
+        // Display the cart items on page load
+        document.addEventListener("DOMContentLoaded", displayCart);
+        document.addEventListener("DOMContentLoaded", updateCartCount);
+    </script>
+</body>
+</html>
